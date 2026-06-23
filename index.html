@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMPOST INDIA — Client Registration Portal</title>
+
+  <style>
+    /* =====================================================
+       DESIGN TOKENS
+       ===================================================== */
+    :root {
+      --blue-900: #0a1f44;
+      --blue-800: #0d2b5e;
+      --blue-700: #1040a0;
+      --blue-500: #2563eb;
+      --blue-400: #3b82f6;
+      --blue-100: #dbeafe;
+      --blue-50:  #eff6ff;
+      --gold:     #c9a84c;
+      --gold-lt:  #f0d98a;
+      --green:    #16a34a;
+      --green-lt: #dcfce7;
+      --white:    #ffffff;
+      --grey-50:  #f8fafc;
+      --grey-100: #f1f5f9;
+      --grey-200: #e2e8f0;
+      --grey-400: #94a3b8;
+      --grey-600: #475569;
+      --grey-800: #1e293b;
+      --red:      #dc2626;
+      --radius-sm: 6px;
+      --radius:    10px;
+      --radius-lg: 16px;
+      --shadow-card: 0 4px 28px rgba(10,31,68,0.11), 0 1px 4px rgba(10,31,68,0.06);
+      --shadow-btn:  0 4px 14px rgba(37,99,235,0.35);
+      --font-display: 'Georgia', 'Times New Roman', serif;
+      --font-body:    'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      --transition:   0.18s ease;
+    }
+
+    /* =====================================================
+       RESET & BASE
+       ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--grey-50);
+      color: var(--grey-800);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+    header {
+      background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-800) 60%, #142d70 100%);
+      color: var(--white);
+      padding: 36px 24px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: rgba(201,168,76,0.10); pointer-events: none;
+    }
+    header::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -40px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: rgba(37,99,235,0.12); pointer-events: none;
+    }
+    .header-inner { position: relative; z-index: 1; }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      font-weight: 700; letter-spacing: 0.08em;
+      color: var(--white); text-transform: uppercase;
+    }
+    .brand-name span { color: var(--gold); font-style: italic; }
+    .brand-rule {
+      width: 60px; height: 3px; background: var(--gold);
+      margin: 10px auto 12px; border-radius: 2px;
+    }
+    .tagline {
+      font-size: 0.92rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(255,255,255,0.72); font-weight: 400;
+    }
+
+    /* =====================================================
+       PROGRESS BAR STRIP
+       ===================================================== */
+    .progress-strip {
+      background: var(--blue-800);
+      padding: 20px 24px 0;
+      position: sticky; top: 0; z-index: 90;
+      box-shadow: 0 2px 10px rgba(10,31,68,0.30);
+    }
+
+    /* step dots row */
+    .progress-steps {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      max-width: 820px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* connector line behind dots */
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 16px; left: calc(50% / var(--step-count, 5) );
+      right: calc(50% / var(--step-count, 5) );
+      height: 2px;
+      background: rgba(255,255,255,0.18);
+      z-index: 0;
+    }
+
+    .step-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
+      cursor: default;
+    }
+
+    .step-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
+      position: relative;
+    }
+
+    /* completed step */
+    .step-item.done .step-dot {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--white);
+    }
+    .step-item.done .step-dot::after {
+      content: '✓';
+      font-size: 0.8rem;
+    }
+    .step-item.done .step-dot span { display: none; }
+
+    /* active step */
+    .step-item.active .step-dot {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--blue-900);
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px rgba(201,168,76,0.25);
+    }
+
+    .step-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+      text-align: center;
+      line-height: 1.3;
+      max-width: 72px;
+      transition: color 0.25s;
+    }
+    .step-item.active .step-label { color: var(--gold-lt); font-weight: 600; }
+    .step-item.done  .step-label { color: rgba(255,255,255,0.60); }
+
+    /* thin progress bar underneath */
+    .progress-bar-track {
+      max-width: 820px; margin: 12px auto 0;
+      height: 4px; background: rgba(255,255,255,0.12);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--blue-400), var(--gold));
+      border-radius: 2px;
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* step counter label */
+    .progress-counter {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
+      padding: 8px 0 14px;
+      letter-spacing: 0.05em;
+    }
+    .progress-counter strong { color: rgba(255,255,255,0.8); }
+
+    /* =====================================================
+       PAGE WRAPPER
+       ===================================================== */
+    .page-wrapper {
+      max-width: 900px;
+      margin: 36px auto 60px;
+      padding: 0 16px;
+    }
+
+    /* =====================================================
+       FORM CARD & STEP PANELS
+       ===================================================== */
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    /* each step panel */
+    .step-panel {
+      display: none;
+      animation: fadeSlide 0.28s ease;
+    }
+    .step-panel.active { display: block; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* =====================================================
+       CLIENT TYPE SELECTOR  (Step 0)
+       ===================================================== */
+    .client-type-panel {
+      padding: 48px 36px 40px;
+      text-align: center;
+    }
+    .client-type-panel h2 {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--blue-900); margin-bottom: 8px;
+    }
+    .client-type-panel p {
+      color: var(--grey-600); font-size: 0.93rem; margin-bottom: 36px;
+    }
+
+    .type-cards {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .type-card {
+      flex: 1; min-width: 220px; max-width: 280px;
+      border: 2px solid var(--grey-200);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      background: var(--white);
+      position: relative;
+    }
+    .type-card:hover {
+      border-color: var(--blue-400);
+      box-shadow: 0 6px 24px rgba(37,99,235,0.12);
+      transform: translateY(-3px);
+    }
+    .type-card.selected {
+      border-color: var(--blue-500);
+      background: var(--blue-50);
+      box-shadow: 0 6px 24px rgba(37,99,235,0.18);
+    }
+    .type-card.selected::after {
+      content: '✓';
+      position: absolute; top: 12px; right: 14px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--blue-500); color: var(--white);
+      font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .type-icon {
+      font-size: 2.8rem; margin-bottom: 14px; display: block;
+    }
+    .type-card h3 {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--blue-900); margin-bottom: 6px;
+    }
+    .type-card p {
+      font-size: 0.82rem; color: var(--grey-600);
+      margin-bottom: 0; line-height: 1.5;
+    }
+
+    /* hidden radio */
+    .type-card input[type="radio"] { display: none; }
+
+    /* =====================================================
+       SECTION HEADINGS
+       ===================================================== */
+    .form-section {
+      padding: 32px 36px;
+      border-bottom: 1px solid var(--grey-200);
+    }
+    .form-section:last-of-type { border-bottom: none; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+    }
+    .section-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--blue-500); color: var(--white);
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--blue-900); letter-spacing: 0.02em;
+    }
+    .section-subtitle { font-size: 0.8rem; color: var(--grey-400); margin-top: 2px; }
+
+    /* =====================================================
+       FORM GRID & FIELDS
+       ===================================================== */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px;
+    }
+    .form-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid.one-col   { grid-template-columns: 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full-width { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--grey-600); letter-spacing: 0.03em; text-transform: uppercase;
+    }
+    .req { color: var(--red); margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--grey-200); border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 0.93rem; color: var(--grey-800);
+      background: var(--white); outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue-400);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    input::placeholder, textarea::placeholder { color: var(--grey-400); font-size: 0.88rem; }
+
+    select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
+    }
+    textarea { resize: vertical; min-height: 110px; }
+
+    /* =====================================================
+       BRANCH REP EXTRA FIELDS (shown conditionally via JS)
+       ===================================================== */
+    .branch-only { display: none; }
+    body.is-branch .branch-only { display: grid; }
+    body.is-branch .branch-only.form-section { display: block; }
+
+    /* =====================================================
+       UPLOAD GRID
+       ===================================================== */
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+    .upload-item { display: flex; flex-direction: column; gap: 6px; }
+    input[type="file"] { padding: 8px 12px; background: var(--grey-50); cursor: pointer; font-size: 0.82rem; }
+    input[type="file"]:hover { border-color: var(--blue-400); }
+
+    /* =====================================================
+       CHECKBOXES & RADIOS
+       ===================================================== */
+    .checkbox-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; border: 1.5px solid var(--grey-200);
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .check-item:hover { border-color: var(--blue-400); background: var(--blue-50); }
+    .check-item input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--blue-500); flex-shrink: 0;
+    }
+    .check-label { font-size: 0.88rem; font-weight: 500; color: var(--grey-800); text-transform: none; letter-spacing: 0; }
+
+    .radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+    .radio-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 14px; border: 1.5px solid var(--grey-200);
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .radio-item:hover { border-color: var(--blue-400); background: var(--blue-50); }
+    .radio-item input[type="radio"] { accent-color: var(--blue-500); width: 15px; height: 15px; }
+    .radio-label { font-size: 0.9rem; font-weight: 600; color: var(--grey-800); text-transform: none; letter-spacing: 0; }
+
+    /* =====================================================
+       DECLARATION
+       ===================================================== */
+    .declaration-box {
+      background: var(--blue-50); border: 1.5px solid var(--blue-100);
+      border-radius: var(--radius); padding: 20px 22px;
+    }
+    .declaration-row { display: flex; align-items: flex-start; gap: 14px; }
+    .declaration-row input[type="checkbox"] {
+      width: 18px; height: 18px; margin-top: 2px; accent-color: var(--blue-500); flex-shrink: 0;
+    }
+    .declaration-text { font-size: 0.9rem; color: var(--grey-600); line-height: 1.7; }
+
+    /* =====================================================
+       NAVIGATION BUTTONS
+       ===================================================== */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 36px;
+      border-top: 1px solid var(--grey-200);
+      background: var(--grey-50);
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition), opacity var(--transition);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-back {
+      background: var(--white);
+      color: var(--grey-600);
+      border: 1.5px solid var(--grey-200);
+    }
+    .btn-back:hover { border-color: var(--blue-400); color: var(--blue-500); }
+
+    .btn-next {
+      background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%);
+      color: var(--white);
+      box-shadow: var(--shadow-btn);
+      margin-left: auto;
+    }
+    .btn-next:hover { filter: brightness(1.08); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--green) 0%, #15803d 100%);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+      margin-left: auto;
+      padding: 14px 44px;
+      font-size: 0.95rem;
+    }
+    .btn-submit:hover { filter: brightness(1.08); box-shadow: 0 6px 20px rgba(22,163,74,0.45); }
+
+    /* =====================================================
+       SUCCESS SCREEN
+       ===================================================== */
+    .success-panel {
+      display: none;
+      padding: 64px 36px 56px;
+      text-align: center;
+    }
+    .success-panel.active { display: block; animation: fadeSlide 0.4s ease; }
+
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--green-lt); border: 3px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; font-size: 2rem;
+    }
+    .success-panel h2 {
+      font-size: 1.6rem; font-weight: 700; color: var(--blue-900); margin-bottom: 10px;
+    }
+    .success-panel p {
+      color: var(--grey-600); font-size: 0.95rem; max-width: 480px; margin: 0 auto 28px;
+    }
+    .ref-tag {
+      display: inline-block;
+      background: var(--blue-50); border: 1px solid var(--blue-100);
+      border-radius: var(--radius); padding: 10px 22px;
+      font-size: 0.85rem; color: var(--blue-700); font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+    footer {
+      background: var(--blue-900); color: rgba(255,255,255,0.65);
+      padding: 40px 24px 28px; text-align: center;
+    }
+    .footer-brand {
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;
+      color: var(--white); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .footer-brand span { color: var(--gold); font-style: italic; }
+    .footer-rule { width: 40px; height: 2px; background: var(--gold); margin: 10px auto 18px; border-radius: 1px; }
+    .footer-contact {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 8px 28px; font-size: 0.88rem; margin-bottom: 18px;
+    }
+    .footer-contact span { display: flex; align-items: center; gap: 6px; }
+    .footer-icon { width: 15px; height: 15px; fill: var(--gold); flex-shrink: 0; }
+    .footer-copy {
+      font-size: 0.78rem; color: rgba(255,255,255,0.35);
+      border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-top: 4px;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+    @media (max-width: 720px) {
+      .form-section { padding: 22px 18px; }
+      .form-grid, .form-grid.three-col { grid-template-columns: 1fr; }
+      .upload-grid { grid-template-columns: 1fr; }
+      .step-nav { padding: 18px; }
+      .step-label { display: none; }
+      .client-type-panel { padding: 32px 18px 28px; }
+    }
+    @media (max-width: 480px) {
+      .type-cards { flex-direction: column; align-items: center; }
+      .type-card { max-width: 100%; width: 100%; }
+      .radio-grid { grid-template-columns: 1fr 1fr; }
+      .checkbox-grid { grid-template-columns: 1fr 1fr; }
+      .btn { padding: 11px 22px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
+<header>
+  <div class="header-inner">
+    <div class="brand-name">IMPOST <span>INDIA</span></div>
+    <div class="brand-rule"></div>
+    <div class="tagline">Digital Tax &amp; Financial Solutions</div>
+  </div>
+</header>
+
+<!-- =====================================================
+     PROGRESS BAR STRIP
+     ===================================================== -->
+<div class="progress-strip" id="progressStrip">
+  <div class="progress-steps" id="progressSteps">
+    <!-- filled by JS -->
+  </div>
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-counter" id="progressCounter"></div>
+</div>
+
+<!-- =====================================================
+     MAIN
+     ===================================================== -->
+<main class="page-wrapper">
+  <form id="mainForm" method="post" action="#" enctype="multipart/form-data" novalidate>
+
+    <!-- ================================================
+         STEP 0 — CLIENT TYPE SELECTION
+         ================================================ -->
+    <div class="form-card">
+      <div class="step-panel active" id="panel-0">
+        <div class="client-type-panel">
+          <h2>Who are you registering as?</h2>
+          <p>Select the option that best describes who is filling this form. This helps us collect the right information.</p>
+
+          <div class="type-cards">
+
+            <!-- Individual Client -->
+            <label class="type-card" id="card-individual" for="type-individual">
+              <input type="radio" id="type-individual" name="client_type" value="individual" />
+              <span class="type-icon">🧑‍💼</span>
+              <h3>Individual Client</h3>
+              <p>I am registering myself for tax filing or financial advisory services.</p>
+            </label>
+
+            <!-- Branch / Office Representative -->
+            <label class="type-card" id="card-branch" for="type-branch">
+              <input type="radio" id="type-branch" name="client_type" value="branch" />
+              <span class="type-icon">🏢</span>
+              <h3>Branch / Office Representative</h3>
+              <p>I am submitting this form on behalf of a branch, office, or organisation.</p>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- nav: only Next -->
+        <div class="step-nav">
+          <span style="font-size:0.82rem;color:var(--grey-400);">Please select a registration type to continue.</span>
+          <button type="button" class="btn btn-next" onclick="goNext()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           STEP 1 — PERSONAL INFORMATION
+           ================================================ -->
+      <div class="step-panel" id="panel-1">
+        <section class="form-section" aria-labelledby="sec-a-title">
+          <div class="section-header">
+            <span class="section-badge">A</span>
+            <div>
+              <div class="section-title" id="sec-a-title">Personal Information</div>
+              <div class="section-subtitle">Basic identification details of the client</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field full-width">
+              <label for="full-name">Full Name <span class="req">*</span></label>
+              <input type="text" id="full-name" name="full_name" placeholder="As per PAN card" required />
+            </div>
+            <div class="field">
+              <label for="pan">PAN Number <span class="req">*</span></label>
+              <input type="text" id="pan" name="pan_number" placeholder="e.g. ABCDE1234F" maxlength="10" required />
+            </div>
+            <div class="field">
+              <label for="aadhaar">Aadhaar Number <span class="req">*</span></label>
+              <input type="text" id="aadhaar" name="aadhaar_number" placeholder="12-digit Aadhaar" maxlength="14" required />
+            </div>
+            <div class="field">
+              <label for="dob">Date of Birth <span class="req">*</span></label>
+              <input type="date" id="dob" name="dob" required />
+            </div>
+            <div class="field">
+              <label for="mobile">Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="mobile" name="mobile" placeholder="+91 XXXXXXXXXX" maxlength="13" required />
+            </div>
+            <div class="field">
+              <label for="alt-mobile">Alternate Mobile</label>
+              <input type="tel" id="alt-mobile" name="alt_mobile" placeholder="+91 XXXXXXXXXX" maxlength="13" />
+            </div>
+            <div class="field full-width">
+              <label for="email">Email Address <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="client@example.com" required />
+            </div>
+          </div>
+        </section>
+
+        <!-- Section B: Address -->
+        <section class="form-section" aria-labelledby="sec-b-title">
+          <div class="section-header">
+            <span class="section-badge">B</span>
+            <div>
+              <div class="section-title" id="sec-b-title">Address Information</div>
+              <div class="section-subtitle">Current residential or business address</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field full-width">
+              <label for="address">Address <span class="req">*</span></label>
+              <textarea id="address" name="address" placeholder="House/Flat No., Street, Locality" rows="3" required></textarea>
+            </div>
+            <div class="field">
+              <label for="city">City <span class="req">*</span></label>
+              <input type="text" id="city" name="city" placeholder="City" required />
+            </div>
+            <div class="field">
+              <label for="state">State <span class="req">*</span></label>
+              <select id="state" name="state" required>
+                <option value="" disabled selected>Select State</option>
+                <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+                <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+                <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+                <option>Himachal Pradesh</option><option>Jharkhand</option>
+                <option>Karnataka</option><option>Kerala</option>
+                <option>Madhya Pradesh</option><option>Maharashtra</option>
+                <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+                <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+                <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+                <option>Telangana</option><option>Tripura</option>
+                <option>Uttar Pradesh</option><option>Uttarakhand</option>
+                <option>West Bengal</option>
+                <option>Andaman and Nicobar Islands</option>
+                <option>Chandigarh</option><option>Dadra and Nagar Haveli</option>
+                <option>Daman and Diu</option><option>Delhi</option>
+                <option>Jammu and Kashmir</option><option>Ladakh</option>
+                <option>Lakshadweep</option><option>Puducherry</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pincode">PIN Code <span class="req">*</span></label>
+              <input type="text" id="pincode" name="pincode" placeholder="6-digit PIN" maxlength="6" required />
+            </div>
+          </div>
+        </section>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-back" onclick="goBack()">← Back</button>
+          <button type="button" class="btn btn-next" onclick="goNext()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           STEP 2 — INCOME & TAX FILING
+           ================================================ -->
+      <div class="step-panel" id="panel-2">
+
+        <!-- Section C: Income -->
+        <section class="form-section" aria-labelledby="sec-c-title">
+          <div class="section-header">
+            <span class="section-badge">C</span>
+            <div>
+              <div class="section-title" id="sec-c-title">Income Information</div>
+              <div class="section-subtitle">Nature and source of income during the assessment year</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="income-type">Income Type <span class="req">*</span></label>
+              <select id="income-type" name="income_type" required>
+                <option value="" disabled selected>Select Income Type</option>
+                <option value="salaried">Salaried</option>
+                <option value="business">Business Owner</option>
+                <option value="freelancer">Freelancer</option>
+                <option value="rental">Rental Income</option>
+                <option value="capital-gains">Capital Gains</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="annual-income">Annual Income (₹) <span class="req">*</span></label>
+              <input type="number" id="annual-income" name="annual_income" placeholder="e.g. 750000" min="0" required />
+            </div>
+            <div class="field">
+              <label for="employer-name">Employer Name</label>
+              <input type="text" id="employer-name" name="employer_name" placeholder="Current employer / organisation" />
+            </div>
+            <div class="field">
+              <label for="business-name">Business Name <em style="font-style:normal;font-weight:400;">(Optional)</em></label>
+              <input type="text" id="business-name" name="business_name" placeholder="Proprietorship / firm name, if any" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Section D: Tax Filing -->
+        <section class="form-section" aria-labelledby="sec-d-title">
+          <div class="section-header">
+            <span class="section-badge">D</span>
+            <div>
+              <div class="section-title" id="sec-d-title">Tax Filing Details</div>
+              <div class="section-subtitle">ITR assessment year and applicable return form</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="assessment-year">Assessment Year <span class="req">*</span></label>
+              <select id="assessment-year" name="assessment_year" required>
+                <option value="" disabled selected>Select AY</option>
+                <option value="2025-26">AY 2025-26</option>
+                <option value="2024-25">AY 2024-25</option>
+                <option value="2023-24">AY 2023-24</option>
+                <option value="2022-23">AY 2022-23</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:18px;">
+            <label style="display:block;margin-bottom:10px;">Return Type <span class="req">*</span></label>
+            <div class="radio-grid">
+              <label class="radio-item"><input type="radio" name="return_type" value="ITR-1" required /><span class="radio-label">ITR-1</span></label>
+              <label class="radio-item"><input type="radio" name="return_type" value="ITR-2" /><span class="radio-label">ITR-2</span></label>
+              <label class="radio-item"><input type="radio" name="return_type" value="ITR-3" /><span class="radio-label">ITR-3</span></label>
+              <label class="radio-item"><input type="radio" name="return_type" value="ITR-4" /><span class="radio-label">ITR-4</span></label>
+            </div>
+          </div>
+        </section>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-back" onclick="goBack()">← Back</button>
+          <button type="button" class="btn btn-next" onclick="goNext()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           STEP 3 — BANK & SERVICES
+           ================================================ -->
+      <div class="step-panel" id="panel-3">
+
+        <!-- Section E: Bank -->
+        <section class="form-section" aria-labelledby="sec-e-title">
+          <div class="section-header">
+            <span class="section-badge">E</span>
+            <div>
+              <div class="section-title" id="sec-e-title">Bank Details</div>
+              <div class="section-subtitle">For refund credit and verification purposes</div>
+            </div>
+          </div>
+          <div class="form-grid three-col">
+            <div class="field">
+              <label for="bank-name">Bank Name <span class="req">*</span></label>
+              <input type="text" id="bank-name" name="bank_name" placeholder="e.g. State Bank of India" required />
+            </div>
+            <div class="field">
+              <label for="account-number">Account Number <span class="req">*</span></label>
+              <input type="text" id="account-number" name="account_number" placeholder="Savings / Current A/C No." required />
+            </div>
+            <div class="field">
+              <label for="ifsc">IFSC Code <span class="req">*</span></label>
+              <input type="text" id="ifsc" name="ifsc_code" placeholder="e.g. SBIN0001234" maxlength="11" required />
+            </div>
+          </div>
+        </section>
+
+        <!-- Section F: Services -->
+        <section class="form-section" id="services-section" aria-labelledby="sec-f-title">
+          <div class="section-header">
+            <span class="section-badge">F</span>
+            <div>
+              <div class="section-title" id="sec-f-title">Service Required</div>
+              <div class="section-subtitle">Select one or more services you require</div>
+            </div>
+          </div>
+          <div class="checkbox-grid">
+            <label class="check-item"><input type="checkbox" name="service[]" value="itr-filing" /><span class="check-label">ITR Filing</span></label>
+            <label class="check-item"><input type="checkbox" name="service[]" value="gst-filing" /><span class="check-label">GST Filing</span></label>
+            <label class="check-item"><input type="checkbox" name="service[]" value="tax-planning" /><span class="check-label">Tax Planning</span></label>
+            <label class="check-item"><input type="checkbox" name="service[]" value="tds-return" /><span class="check-label">TDS Return</span></label>
+            <label class="check-item"><input type="checkbox" name="service[]" value="accounting" /><span class="check-label">Accounting Services</span></label>
+          </div>
+        </section>
+
+        <!-- Section G (Branch only): Branch / Office Details -->
+        <section class="form-section branch-only" id="branch-details-section" aria-labelledby="sec-brx-title">
+          <div class="section-header">
+            <span class="section-badge" style="background:var(--gold);color:var(--blue-900);">★</span>
+            <div>
+              <div class="section-title" id="sec-brx-title">Branch / Office Details</div>
+              <div class="section-subtitle">Required because you are submitting as a Branch Representative</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="org-name">Organisation / Firm Name <span class="req">*</span></label>
+              <input type="text" id="org-name" name="org_name" placeholder="Registered name of the organisation" />
+            </div>
+            <div class="field">
+              <label for="rep-name">Representative Name <span class="req">*</span></label>
+              <input type="text" id="rep-name" name="rep_name" placeholder="Person submitting this form" />
+            </div>
+            <div class="field">
+              <label for="rep-designation">Designation</label>
+              <input type="text" id="rep-designation" name="rep_designation" placeholder="e.g. Accountant, HR Manager" />
+            </div>
+            <div class="field">
+              <label for="rep-contact">Representative Contact <span class="req">*</span></label>
+              <input type="tel" id="rep-contact" name="rep_contact" placeholder="+91 XXXXXXXXXX" maxlength="13" />
+            </div>
+            <div class="field">
+              <label for="gst-number">GST Number (if applicable)</label>
+              <input type="text" id="gst-number" name="gst_number" placeholder="e.g. 07ABCDE1234F1Z5" maxlength="15" />
+            </div>
+            <div class="field">
+              <label for="total-clients">No. of Clients in This Submission</label>
+              <input type="number" id="total-clients" name="total_clients" placeholder="e.g. 12" min="1" />
+            </div>
+          </div>
+        </section>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-back" onclick="goBack()">← Back</button>
+          <button type="button" class="btn btn-next" onclick="goNext()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           STEP 4 — DOCUMENTS & BRANCH DETAILS
+           ================================================ -->
+      <div class="step-panel" id="panel-4">
+
+        <!-- Section G: Documents -->
+        <section class="form-section" aria-labelledby="sec-g-title">
+          <div class="section-header">
+            <span class="section-badge">G</span>
+            <div>
+              <div class="section-title" id="sec-g-title">Document Upload</div>
+              <div class="section-subtitle">Upload clear scanned copies or photos (PDF/JPG/PNG)</div>
+            </div>
+          </div>
+          <div class="upload-grid">
+            <div class="upload-item"><label for="doc-pan">PAN Card</label><input type="file" id="doc-pan" name="doc_pan" accept=".pdf,.jpg,.jpeg,.png" /></div>
+            <div class="upload-item"><label for="doc-aadhaar">Aadhaar Card</label><input type="file" id="doc-aadhaar" name="doc_aadhaar" accept=".pdf,.jpg,.jpeg,.png" /></div>
+            <div class="upload-item"><label for="doc-form16">Form 16</label><input type="file" id="doc-form16" name="doc_form16" accept=".pdf,.jpg,.jpeg,.png" /></div>
+            <div class="upload-item"><label for="doc-bank-stmt">Bank Statement</label><input type="file" id="doc-bank-stmt" name="doc_bank_statement" accept=".pdf,.jpg,.jpeg,.png" /></div>
+            <div class="upload-item"><label for="doc-investment">Investment Proofs</label><input type="file" id="doc-investment" name="doc_investment_proofs" accept=".pdf,.jpg,.jpeg,.png" /></div>
+            <div class="upload-item"><label for="doc-prev-itr">Previous ITR</label><input type="file" id="doc-prev-itr" name="doc_previous_itr" accept=".pdf,.jpg,.jpeg,.png" /></div>
+          </div>
+        </section>
+
+        <!-- Section H: Branch Details (internal) -->
+        <section class="form-section" aria-labelledby="sec-h-title">
+          <div class="section-header">
+            <span class="section-badge">H</span>
+            <div>
+              <div class="section-title" id="sec-h-title">Branch Details</div>
+              <div class="section-subtitle">Internal tracking and assignment</div>
+            </div>
+          </div>
+          <div class="form-grid three-col">
+            <div class="field">
+              <label for="branch-name">Branch Name <span class="req">*</span></label>
+              <input type="text" id="branch-name" name="branch_name" placeholder="e.g. Jabalpur Main" required />
+            </div>
+            <div class="field">
+              <label for="consultant">Consultant Assigned</label>
+              <input type="text" id="consultant" name="consultant_assigned" placeholder="Consultant name" />
+            </div>
+            <div class="field">
+              <label for="submission-date">Submission Date <span class="req">*</span></label>
+              <input type="date" id="submission-date" name="submission_date" required />
+            </div>
+          </div>
+        </section>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-back" onclick="goBack()">← Back</button>
+          <button type="button" class="btn btn-next" onclick="goNext()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           STEP 5 — REMARKS & DECLARATION
+           ================================================ -->
+      <div class="step-panel" id="panel-5">
+
+        <!-- Section I: Remarks -->
+        <section class="form-section" aria-labelledby="sec-i-title">
+          <div class="section-header">
+            <span class="section-badge">I</span>
+            <div>
+              <div class="section-title" id="sec-i-title">Additional Remarks</div>
+              <div class="section-subtitle">Any specific instructions or information</div>
+            </div>
+          </div>
+          <div class="form-grid one-col">
+            <div class="field">
+              <label for="remarks">Remarks</label>
+              <textarea id="remarks" name="remarks" rows="5" placeholder="Please mention any specific instructions, queries, or relevant details here…"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section J: Declaration -->
+        <section class="form-section" aria-labelledby="sec-j-title">
+          <div class="section-header">
+            <span class="section-badge">J</span>
+            <div>
+              <div class="section-title" id="sec-j-title">Declaration</div>
+              <div class="section-subtitle">Please read and acknowledge before submitting</div>
+            </div>
+          </div>
+          <div class="declaration-box">
+            <div class="declaration-row">
+              <input type="checkbox" id="declaration" name="declaration" value="agreed" required />
+              <label for="declaration" class="declaration-text" style="text-transform:none;letter-spacing:0;font-size:0.93rem;cursor:pointer;">
+                I hereby declare that all information provided in this form is
+                <strong>true, accurate, and complete</strong> to the best of my knowledge.
+                I understand that providing false or misleading information may result in
+                legal consequences under the Income Tax Act, 1961, and other applicable laws.
+                I authorise IMPOST INDIA to use this information solely for the purpose of
+                tax filing and financial advisory services.
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-back" onclick="goBack()">← Back</button>
+          <button type="button" class="btn btn-submit" onclick="submitForm()">✓ Submit Client Details</button>
+        </div>
+      </div>
+
+      <!-- ================================================
+           SUCCESS SCREEN
+           ================================================ -->
+      <div class="success-panel" id="successPanel">
+        <div class="success-icon">✓</div>
+        <h2>Registration Submitted!</h2>
+        <p>Thank you. Your client details have been received by IMPOST INDIA. Our team will review your submission and get in touch within 1–2 business days.</p>
+        <div class="ref-tag" id="refTag">REF: IMP-000000</div>
+      </div>
+
+    </div><!-- /.form-card -->
+  </form>
+</main>
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+<footer id="footer">
+  <div class="footer-brand">IMPOST <span>INDIA</span></div>
+  <div class="footer-rule"></div>
+  <div class="footer-contact">
+    <span>
+      <svg class="footer-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+        <path d="M2 5l8 6 8-6" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      info@impostindia.com
+    </span>
+    <span>
+      <svg class="footer-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 4a1 1 0 011-1h3l1.5 4-2 1.5a11.4 11.4 0 005 5l1.5-2 4 1.5v3a1 1 0 01-1 1C8.2 17 3 11.8 3 5V4z" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      +91 98XXXXXXXX
+    </span>
+  </div>
+  <div class="footer-copy">
+    &copy; 2025 IMPOST INDIA — Digital Tax &amp; Financial Solutions. All rights reserved.
+  </div>
+</footer>
+
+<!-- =====================================================
+     JAVASCRIPT — WIZARD LOGIC
+     ===================================================== -->
+<script>
+  /* -------------------------------------------------------
+     STEP CONFIGURATION
+     Each step has a label shown in the progress bar.
+  ------------------------------------------------------- */
+  const STEPS = [
+    { label: 'Type'      },
+    { label: 'Personal'  },
+    { label: 'Income'    },
+    { label: 'Banking'   },
+    { label: 'Documents' },
+    { label: 'Review'    },
+  ];
+
+  const TOTAL = STEPS.length;   // 6 steps (0–5)
+  let current = 0;
+  let clientType = null;        // 'individual' | 'branch'
+
+  /* -------------------------------------------------------
+     BUILD PROGRESS DOTS
+  ------------------------------------------------------- */
+  const stepsEl   = document.getElementById('progressSteps');
+  const fillEl    = document.getElementById('progressFill');
+  const counterEl = document.getElementById('progressCounter');
+
+  function buildProgressDots() {
+    stepsEl.innerHTML = '';
+    STEPS.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'step-item' + (i < current ? ' done' : i === current ? ' active' : '');
+      item.innerHTML = `
+        <div class="step-dot"><span>${i + 1}</span></div>
+        <div class="step-label">${s.label}</div>
+      `;
+      stepsEl.appendChild(item);
+    });
+    // progress bar fill
+    const pct = current === 0 ? 0 : Math.round((current / (TOTAL - 1)) * 100);
+    fillEl.style.width = pct + '%';
+    counterEl.innerHTML = `Step <strong>${current + 1}</strong> of <strong>${TOTAL}</strong> — ${STEPS[current].label}`;
+  }
+
+  /* -------------------------------------------------------
+     SHOW / HIDE PANELS
+  ------------------------------------------------------- */
+  function showPanel(idx) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('panel-' + idx);
+    if (panel) {
+      panel.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    buildProgressDots();
+
+    // hide progress strip on success
+    document.getElementById('progressStrip').style.display =
+      idx === 'success' ? 'none' : '';
+  }
+
+  /* -------------------------------------------------------
+     CLIENT TYPE CARD SELECTION
+  ------------------------------------------------------- */
+  document.querySelectorAll('.type-card').forEach(card => {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      clientType = this.querySelector('input[type="radio"]').value;
+
+      // toggle branch-specific fields
+      if (clientType === 'branch') {
+        document.body.classList.add('is-branch');
+      } else {
+        document.body.classList.remove('is-branch');
+      }
+    });
+  });
+
+  /* -------------------------------------------------------
+     NAVIGATION
+  ------------------------------------------------------- */
+  function goNext() {
+    // Step 0: must select a type
+    if (current === 0) {
+      if (!clientType) {
+        alert('Please select a registration type to continue.');
+        return;
+      }
+    }
+    if (current < TOTAL - 1) {
+      current++;
+      showPanel(current);
+    }
+  }
+
+  function goBack() {
+    if (current > 0) {
+      current--;
+      showPanel(current);
+    }
+  }
+
+  function submitForm() {
+    const decl = document.getElementById('declaration');
+    if (!decl.checked) {
+      alert('Please read and accept the declaration before submitting.');
+      return;
+    }
+    // Generate a pseudo reference number
+    const ref = 'IMP-' + String(Math.floor(100000 + Math.random() * 900000));
+    document.getElementById('refTag').textContent = 'REF: ' + ref;
+
+    // Hide all step panels, show success
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('successPanel').classList.add('active');
+    document.getElementById('progressStrip').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* -------------------------------------------------------
+     INIT
+  ------------------------------------------------------- */
+  buildProgressDots();
+</script>
+
+</body>
+</html>
